@@ -13,29 +13,6 @@
 </head>
 
 <body>
-  <style>
-    /*Ẩn thanh địa chỉ trình duyệt*/
-    body {
-      margin: 0;
-      overflow: hidden;
-    }
-
-    /*Ẩn thanh tab và thanh công cụ*/
-    body::before {
-      content: "";
-      display: block;
-      height: 30px;
-      /* Điều chỉnh chiều cao theo ý muốn */
-    }
-
-    /* Ẩn thanh công cụ */
-    header,
-    nav,
-    footer {
-      display: none;
-    }
-  </style>
-
   <div class="container">
     <img class="mt-5 mx-auto px-4 w-100"
       src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRFNSA3uaS0TDbC-6W54Jg-xiFE5OOfaiDzclE-p1rxoMxKY1PbWFe233W_kTnU7Ex7JPA&usqp=CAU"
@@ -44,6 +21,20 @@
 
   <!-- Optional JavaScript -->
   <script>
+    function enterFullscreen() {
+      const element = document.documentElement;
+      if (element.requestFullscreen) {
+        element.requestFullscreen().catch(error => {
+          console.log(`Error attempting to enable full-screen mode: ${error.message}`);
+        });
+      }
+    }
+
+    // Gọi hàm khi tài liệu HTML được tải xong
+    document.addEventListener("DOMContentLoaded", () => {
+      enterFullscreen();
+    });
+
     var attestationOptions = 'https://fido2.vtcsmarttech.com.vn/webauthn/attestation/options'
     var attestationResult = 'https://fido2.vtcsmarttech.com.vn/webauthn/attestation/result'
     var assertionOptions = 'https://fido2.vtcsmarttech.com.vn/webauthn/assertion/options'
