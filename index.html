@@ -6,17 +6,26 @@
   <!-- Required meta tags -->
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-
   <!-- Bootstrap CSS -->
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
     integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+  <script src="https://cdn.jsdelivr.net/npm/@github/webauthn-json/dist/browser-global/webauthn-json.browser-global.min.js"></script>
+  <!-- jQuery, Popper.js, Bootstrap JS -->
+  <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
+    integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
+    crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"
+    integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1"
+    crossorigin="anonymous"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
+    integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
+    crossorigin="anonymous"></script>
 </head>
 
 <body>
   <div class="container">
   </div>
 
-  <!-- Optional JavaScript -->
   <script>
     var attestationOptions = 'https://fido2.vtcsmarttech.com.vn/webauthn/attestation/options'
     var attestationResult = 'https://fido2.vtcsmarttech.com.vn/webauthn/attestation/result'
@@ -58,7 +67,7 @@
       endpoint_attestation(username, displayName, res => {
         console.log(1234);
         alert(`Attestation Success. Returning Success...`)
-        var successResponse = callback + `?status=${res.status}&message=${res.errorMessage}`
+        var successResponse = callback + `?status=${res.status}&message=${res.errorMessage}&body=${JSON.stringify(res)}`
         window.location.href = successResponse
         closeWindow()
       }, err => {
@@ -73,7 +82,7 @@
     function startWebAuthnVerify(username) {
       endpoint_assertion(username, res => {
         alert(`Assertion Success. Returning Success...`)
-        var successResponse = callback + `?status=${res.status}&message=${res.errorMessage}`
+        var successResponse = callback + `?status=${res.status}&message=${res.errorMessage}&body=${JSON.stringify(res)}`
         window.location.href = successResponse
         closeWindow()
       }, err => {
@@ -93,49 +102,10 @@
 
     function endpoint_attestation(username, displayName, onsuccess, onerror, callback) {
       alert('Sending AttestationRequest to FIDO2 Server...')
-      fetch(attestationOptions, {
-        method: 'post',
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-          "username": username,
-          "displayName": displayName
-        })
-      }).then(res => res.json())
-        .then(res => {
-          if (res.status !== 'ok') {
-            onerror(Error(res.errorMessage));
-            return;
-          }
-          alert('Received AttestationOptions from FIDO2 Server!')
-          alert('Creating Credential using WebAuthn...')
-          webauthnJSON.create({
-            "publicKey": res
-          }).then(response => {
-            alert('Generating AttestationResult...')
-            alert('Responding AttestationResult to FIDO2 Server...')
-            fetch(attestationResult, {
-              method: 'post',
-              headers: {
-                "Content-Type": "application/json"
-              },
-              body: JSON.stringify(response)
-            })
-              .then(res => res.json())
-              .then(res => {
-                onsuccess(res);
-              })
-              .catch(err => {
-                onerror(err);
-              })
-          }).catch(err => {
-            var errorMessage = `WebAuthnAttestationFailed: ${err?.name}: ${err?.message}`
-            onerror(Error(errorMessage));
-          });
-        }).catch(err => {
-          onerror(err);
-        })
+      fetchAPI(attestationOptions, {
+        "username": username,
+        "displayName": displayName
+      }, onsuccess, onerror);
     }
 
     function endpoint_assertion(username, onsuccess, onerror) {
@@ -143,8 +113,11 @@
       var body = {
         "username": username
       }
+      fetchAPI(assertionOptions, body, onsuccess, onerror);
+    }
 
-      fetch(assertionOptions, {
+    function fetchAPI(url, body, onsuccess, onerror) {
+      fetch(url, {
         method: 'post',
         headers: {
           "Content-Type": "application/json"
@@ -156,48 +129,12 @@
             onerror(Error(res.errorMessage));
             return;
           }
-          alert('Received AssertionOptions from FIDO2 Server!')
-          alert('Getting Credential using WebAuthn...')
-          webauthnJSON.get({
-            "publicKey": res
-          }).then(response => {
-            alert('Generating AssertionResult...')
-            alert('Responding AssertionResult to FIDO2 Server...')
-            fetch(assertionResult, {
-              method: 'post',
-              headers: {
-                "Content-Type": "application/json"
-              },
-              body: JSON.stringify(response)
-            }).then(res => res.json())
-              .then(res => {
-                onsuccess(res);
-              })
-              .catch(err => {
-                onerror(err);
-              })
-          }).catch(err => {
-            var errorMessage = `WebAuthnAssertionFailed: ${err?.name}: ${err?.message}`
-            onerror(Error(errorMessage));
-          });
+          onsuccess(res);
         }).catch(err => {
           onerror(err);
         })
     }
   </script>
-  <script
-    src="https://cdn.jsdelivr.net/npm/@github/webauthn-json/dist/browser-global/webauthn-json.browser-global.min.js"></script>
-
-  <!-- jQuery first, then Popper.js, then Bootstrap JS -->
-  <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
-    integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
-    crossorigin="anonymous"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"
-    integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1"
-    crossorigin="anonymous"></script>
-  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
-    integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
-    crossorigin="anonymous"></script>
 </body>
 
 </html>
