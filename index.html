@@ -18,14 +18,14 @@
 
   <!-- Optional JavaScript -->
   <script>
-    console.log("Version: 1.0.2")
+    console.log("Version: 1.0.3")
     var attestationOptions = 'https://fido2.vtcsmarttech.com.vn/webauthn/attestation/options'
     var attestationResult = 'https://fido2.vtcsmarttech.com.vn/webauthn/attestation/result'
     var assertionOptions = 'https://fido2.vtcsmarttech.com.vn/webauthn/assertion/options'
     var assertionResult = 'https://fido2.vtcsmarttech.com.vn/webauthn/assertion/result'
 
     // Tắt alert
-    window.alert = function () { };
+    // window.alert = function () { };
 
     window.onload = () => {
       var username = getQueryParam('username');
