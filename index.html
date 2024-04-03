@@ -18,7 +18,7 @@
 
   <!-- Optional JavaScript -->
   <script>
-    console.log("Version: 1.0.4")
+    console.log("Version: 1.0.5")
     var attestationOptions = 'https://fido2.vtcsmarttech.com.vn/webauthn/attestation/options'
     var attestationResult = 'https://fido2.vtcsmarttech.com.vn/webauthn/attestation/result'
     var assertionOptions = 'https://fido2.vtcsmarttech.com.vn/webauthn/assertion/options'
@@ -74,7 +74,6 @@
       endpoint_assertion(username, res => {
         alert(`Assertion Success. Returning Success...`)
         var successResponse = callback + `?status=${res.status}&message=${res.errorMessage}&body=${JSON.stringify(res)}`
-         alert(`successResponse: ${successResponse}`)
         window.location.href = successResponse
         closeWindow()
       }, err => {
