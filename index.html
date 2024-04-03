@@ -70,7 +70,7 @@
       })
     }
 
-    function startWebAuthnVerify(username) {
+    function startWebAuthnVerify(username, callback) {
       endpoint_assertion(username, res => {
         alert(`Assertion Success. Returning Success...`)
         var successResponse = callback + `?status=${res.status}&message=${res.errorMessage}&body=${JSON.stringify(res)}`
